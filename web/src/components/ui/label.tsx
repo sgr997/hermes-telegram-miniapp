@@ -4,7 +4,7 @@ export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLab
   return (
     <label
       className={cn(
-        "font-display text-xs tracking-[0.1em] uppercase leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+        "font-sans text-sm font-medium leading-none text-[var(--color-foreground)] peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
         className,
       )}
       {...props}

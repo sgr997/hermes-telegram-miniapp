@@ -4,9 +4,10 @@ export function Select({ className, ...props }: React.SelectHTMLAttributes<HTMLS
   return (
     <select
       className={cn(
-        "flex h-9 w-full border border-border bg-background/40 px-3 py-1 font-courier text-sm",
-        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 focus-visible:border-foreground/25",
+        "flex h-9 w-full rounded-md border border-border bg-white px-3 py-1 font-sans text-sm text-foreground",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus:border-primary",
         "disabled:cursor-not-allowed disabled:opacity-50",
+        "transition-all duration-150 ease",
         className,
       )}
       {...props}

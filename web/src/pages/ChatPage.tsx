@@ -3,7 +3,6 @@ import { Send, StopCircle, Paperclip, X } from "lucide-react";
 import { api } from "@/lib/api";
 import type { ModelInfo } from "@/lib/api";
 import { Markdown } from "@/components/Markdown";
-import { DnaLoader } from "@/components/DnaLoader";
 import { Button } from "@/components/ui/button";
 
 interface ChatMsg {
@@ -23,7 +22,23 @@ export default function ChatPage() {
   const sessionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    api.getModelInfo().then(setModelInfo).catch(() => {});
+    let cancelled = false;
+    const load = (attempt = 0) => {
+      api
+        .getModelInfo()
+        .then((info) => {
+          if (!cancelled) setModelInfo(info);
+        })
+        .catch(() => {
+          if (!cancelled && attempt < 3) {
+            setTimeout(() => load(attempt + 1), 800 * (attempt + 1));
+          }
+        });
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -57,7 +72,7 @@ export default function ChatPage() {
     if (!text && !attachedFile) return;
     if (streaming) return;
 
-    const displayText = text || "(image)";
+    const displayText = text || "(图片)";
     setInput("");
     setStreaming(true);
 
@@ -82,7 +97,7 @@ export default function ChatPage() {
         const r = await api.executeCommand({ command: "/" + cmd, args });
         setMessages((prev) => [
           ...prev,
-          { role: "command", content: r.output || "(no output)" },
+          { role: "command", content: r.output || "(无输出)" },
         ]);
       } catch (e: any) {
         setMessages((prev) => [
@@ -149,45 +164,48 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="flex flex-col h-full bg-background">
       {/* Context bar */}
-      <div className="flex items-center gap-3 px-4 py-2 border-b border-border text-xs text-muted-foreground shrink-0">
-        <span className="font-medium">{modelInfo?.model_short || "—"}</span>
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-border bg-card text-xs text-muted-foreground shrink-0">
+        <span className="font-medium text-foreground">{modelInfo?.model_short || "加载中…"}</span>
         {modelInfo?.provider && <span className="opacity-60">via {modelInfo.provider}</span>}
-        <span className="opacity-40">|</span>
-        <span className="text-green-500">● Ready</span>
+        <span className="opacity-30">|</span>
+        <span className="text-green-600">● Ready</span>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-            <p className="text-lg font-display mb-2">Hermes Agent</p>
+            <p className="text-lg font-sans font-semibold mb-1 text-foreground">Hermes Agent</p>
             <p className="text-sm opacity-60">Send a message to start chatting</p>
           </div>
         )}
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div
-              className={`max-w-[85%] rounded-lg px-3 py-2 ${
+              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm transition-all ${
                 msg.role === "user"
                   ? "bg-primary text-primary-foreground"
                   : msg.role === "system"
-                    ? "bg-muted text-muted-foreground italic text-sm"
+                    ? "bg-red-50 text-red-700 border border-red-200 italic"
                     : msg.role === "command"
-                      ? "bg-secondary text-secondary-foreground font-mono text-xs whitespace-pre-wrap"
-                      : "bg-secondary text-secondary-foreground"
+                      ? "bg-muted text-foreground font-mono text-xs whitespace-pre-wrap border border-border"
+                      : "bg-card text-foreground border border-border"
               }`}
             >
               {msg.role === "assistant" ? (
-                <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap break-words">
+                <div className="prose prose-sm max-w-none whitespace-pre-wrap break-words">
                   {streaming && i === messages.length - 1 && !msg.content ? (
-                    <DnaLoader />
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <div className="h-4 w-4 rounded-full border-2 border-border border-t-primary animate-spin" />
+                      <span className="text-xs">Thinking…</span>
+                    </div>
                   ) : (
                     <>
                       <Markdown content={msg.content} />
                       {streaming && i === messages.length - 1 && (
-                        <span className="inline-block w-1.5 h-4 bg-foreground/70 animate-pulse ml-0.5 align-text-bottom" />
+                        <span className="inline-block w-1.5 h-4 bg-primary/70 animate-pulse ml-0.5 align-text-bottom" />
                       )}
                     </>
                   )}
@@ -203,24 +221,27 @@ export default function ChatPage() {
 
       {/* Attachment preview */}
       {attachedFile && (
-        <div className="flex items-center gap-2 px-4 py-1 border-t border-border text-xs">
-          <Paperclip className="h-3 w-3" />
-          <span className="truncate">{attachedFile.name}</span>
-          <button onClick={() => setAttachedFile(null)} className="text-muted-foreground hover:text-foreground">
+        <div className="flex items-center gap-2 px-4 py-2 border-t border-border bg-card text-xs">
+          <Paperclip className="h-3 w-3 text-muted-foreground" />
+          <span className="truncate text-foreground">{attachedFile.name}</span>
+          <button
+            onClick={() => setAttachedFile(null)}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
             <X className="h-3 w-3" />
           </button>
         </div>
       )}
 
       {/* Input bar */}
-      <div className="flex items-end gap-2 px-4 py-3 border-t border-border shrink-0">
+      <div className="flex items-end gap-2 px-4 py-3 border-t border-border bg-card shrink-0">
         <Button variant="ghost" size="icon" className="shrink-0 h-9 w-9" onClick={handleFileAttach}>
           <Paperclip className="h-4 w-4" />
         </Button>
         <textarea
           ref={inputRef}
-          className="flex-1 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring min-h-[38px] max-h-[120px]"
-          placeholder="Message Hermes..."
+          className="flex-1 resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary min-h-[38px] max-h-[120px] transition-colors"
+          placeholder="给 Hermes 发消息..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}

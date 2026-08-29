@@ -8,14 +8,34 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
 const FILES = ["agent", "errors", "gateway"] as const;
+const FILE_LABELS: Record<string, string> = {
+  agent: "智能体",
+  errors: "错误",
+  gateway: "网关",
+};
 const LEVELS = ["ALL", "DEBUG", "INFO", "WARNING", "ERROR"] as const;
+const LEVEL_LABELS: Record<string, string> = {
+  ALL: "全部",
+  DEBUG: "调试",
+  INFO: "信息",
+  WARNING: "警告",
+  ERROR: "错误",
+};
 const COMPONENTS = ["all", "gateway", "agent", "tools", "cli", "cron"] as const;
+const COMPONENT_LABELS: Record<string, string> = {
+  all: "全部",
+  gateway: "网关",
+  agent: "智能体",
+  tools: "工具",
+  cli: "命令行",
+  cron: "定时任务",
+};
 const LINE_COUNTS = [50, 100, 200, 500] as const;
 
 function classifyLine(line: string): "error" | "warning" | "info" | "debug" {
   const upper = line.toUpperCase();
-  if (upper.includes("ERROR") || upper.includes("CRITICAL") || upper.includes("FATAL")) return "error";
-  if (upper.includes("WARNING") || upper.includes("WARN")) return "warning";
+  if (upper.includes("ERROR") || upper.includes("严重") || upper.includes("致命")) return "error";
+  if (upper.includes("WARNING") || upper.includes("警告")) return "warning";
   if (upper.includes("DEBUG")) return "debug";
   return "info";
 }
@@ -32,11 +52,13 @@ function FilterBar<T extends string>({
   options,
   value,
   onChange,
+  labelMap,
 }: {
   label: string;
   options: readonly T[];
   value: T;
   onChange: (v: T) => void;
+  labelMap?: Record<string, string>;
 }) {
   return (
     <div className="flex items-center gap-2 flex-wrap">
@@ -50,7 +72,7 @@ function FilterBar<T extends string>({
             className="text-xs h-7 px-2.5"
             onClick={() => onChange(opt)}
           >
-            {opt}
+            {labelMap?.[opt] ?? opt}
           </Button>
         ))}
       </div>
@@ -76,7 +98,6 @@ export default function LogsPage() {
       .getLogs({ file, lines: lineCount, level, component })
       .then((resp) => {
         setLines(resp.lines);
-        // Auto-scroll to bottom
         setTimeout(() => {
           if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -87,12 +108,10 @@ export default function LogsPage() {
       .finally(() => setLoading(false));
   }, [file, lineCount, level, component]);
 
-  // Initial load + refetch on filter change
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
 
-  // Auto-refresh polling
   useEffect(() => {
     if (!autoRefresh) return;
     const interval = setInterval(fetchLogs, 5000);
@@ -136,11 +155,11 @@ export default function LogsPage() {
 
         <CardContent>
           <div className="flex flex-col gap-3 mb-4">
-            <FilterBar label="File" options={FILES} value={file} onChange={setFile} />
-            <FilterBar label="Level" options={LEVELS} value={level} onChange={setLevel} />
-            <FilterBar label="Component" options={COMPONENTS} value={component} onChange={setComponent} />
+            <FilterBar label="文件" options={FILES} value={file} onChange={setFile} labelMap={FILE_LABELS} />
+            <FilterBar label="级别" options={LEVELS} value={level} onChange={setLevel} labelMap={LEVEL_LABELS} />
+            <FilterBar label="组件" options={COMPONENTS} value={component} onChange={setComponent} labelMap={COMPONENT_LABELS} />
             <FilterBar
-              label="Lines"
+              label="行数"
               options={LINE_COUNTS.map(String) as unknown as readonly string[]}
               value={String(lineCount)}
               onChange={(v) => setLineCount(Number(v) as (typeof LINE_COUNTS)[number])}
@@ -148,14 +167,14 @@ export default function LogsPage() {
           </div>
 
           {error && (
-            <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3 mb-4">
+            <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 mb-4">
               <p className="text-sm text-destructive">{error}</p>
             </div>
           )}
 
           <div
             ref={scrollRef}
-            className="border border-border bg-background p-4 font-mono-ui text-xs leading-5 overflow-auto overflow-x-auto max-h-[600px] min-h-[200px]"
+            className="border border-border bg-muted/30 p-4 font-mono text-xs leading-5 overflow-auto overflow-x-auto max-h-[600px] min-h-[200px] rounded-lg"
           >
             {lines.length === 0 && !loading && (
               <p className="text-muted-foreground text-center py-8">No log lines found</p>
@@ -163,7 +182,7 @@ export default function LogsPage() {
             {lines.map((line, i) => {
               const cls = classifyLine(line);
               return (
-                <div key={i} className={`${LINE_COLORS[cls]} hover:bg-secondary/20 px-1 -mx-1 rounded whitespace-pre-wrap break-all`}>
+                <div key={i} className={`${LINE_COLORS[cls]} hover:bg-muted/50 px-1 -mx-1 rounded whitespace-pre-wrap break-all`}>
                   {line}
                 </div>
               );

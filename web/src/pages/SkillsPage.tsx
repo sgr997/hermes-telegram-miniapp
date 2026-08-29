@@ -30,14 +30,14 @@ interface CategoryGroup {
 
 const CATEGORY_LABELS: Record<string, string> = {
   mlops: "MLOps",
-  "mlops/cloud": "MLOps / Cloud",
-  "mlops/evaluation": "MLOps / Evaluation",
-  "mlops/inference": "MLOps / Inference",
-  "mlops/models": "MLOps / Models",
-  "mlops/training": "MLOps / Training",
-  "mlops/vector-databases": "MLOps / Vector DBs",
+  "mlops/cloud": "MLOps / 云",
+  "mlops/evaluation": "MLOps / 评估",
+  "mlops/inference": "MLOps / 推理",
+  "mlops/models": "MLOps / 模型",
+  "mlops/training": "MLOps / 训练",
+  "mlops/vector-databases": "MLOps / 向量数据库",
   mcp: "MCP",
-  "red-teaming": "Red Teaming",
+  "red-teaming": "红队测试",
   ocr: "OCR",
   p5js: "p5.js",
   ai: "AI",
@@ -46,7 +46,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 function prettyCategory(raw: string | null | undefined): string {
-  if (!raw) return "General";
+  if (!raw) return "通用";
   if (CATEGORY_LABELS[raw]) return CATEGORY_LABELS[raw];
   return raw
     .split(/[-_/]/)
@@ -77,7 +77,7 @@ export default function SkillsPage() {
         setSkills(s);
         setToolsets(t);
       })
-      .catch(() => showToast("Failed to load skills/toolsets", "error"))
+      .catch(() => showToast("技能/工具集加载失败", "error"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -92,7 +92,7 @@ export default function SkillsPage() {
         )
       );
       showToast(
-        `${skill.name} ${skill.enabled ? "disabled" : "enabled"}`,
+        `${skill.name} ${skill.enabled ? "disabled" : "已启用"}`,
         "success"
       );
     } catch {
@@ -179,7 +179,7 @@ export default function SkillsPage() {
   const toggleCollapse = (key: string) => {
     setCollapsedCategories((prev) => {
       if (prev === "all") {
-        // Switching from "all collapsed" → expand just this one
+        // Switching from "全部已折叠" → expand just this one
         const allKeys = new Set(categoryGroups.map((g) => g.key));
         allKeys.delete(key);
         return allKeys;
@@ -195,40 +195,44 @@ export default function SkillsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 font-sans">
       <Toast toast={toast} />
 
-      {/* ═══════════════ Header + Search ═══════════════ */}
+      {/* ═══════════════ Header ═══════════════ */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Package className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-base font-semibold">Skills</h1>
-          <span className="text-xs text-muted-foreground">
-            {enabledCount}/{skills.length} enabled
-          </span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Package className="h-4 w-4" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-lg font-semibold text-foreground">Skills</h1>
+            <span className="text-xs text-muted-foreground">
+              {enabledCount}/{skills.length} enabled
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* ═══════════════ Search + Category Filter ═══════════════ */}
+      {/* ═══════════════ Search ═══════════════ */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            className="pl-9"
-            placeholder="Search skills and toolsets..."
+            className="pl-9 h-9"
+            placeholder="搜索技能和工具集..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           {search && (
             <button
               type="button"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => setSearch("")}
             >
               <X className="h-4 w-4" />
@@ -243,10 +247,10 @@ export default function SkillsPage() {
           <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
           <button
             type="button"
-            className={`inline-flex items-center px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
+            className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-md border transition-all cursor-pointer ${
               !activeCategory
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                ? "bg-primary text-primary-foreground border-primary shadow-sm hover:-translate-y-0.5"
+                : "bg-card text-foreground border-border hover:border-primary/40 hover:bg-muted/50"
             }`}
             onClick={() => setActiveCategory(null)}
           >
@@ -256,17 +260,17 @@ export default function SkillsPage() {
             <button
               key={key}
               type="button"
-              className={`inline-flex items-center px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
+              className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-md border transition-all cursor-pointer ${
                 activeCategory === key
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm hover:-translate-y-0.5"
+                  : "bg-card text-foreground border-border hover:border-primary/40 hover:bg-muted/50"
               }`}
               onClick={() =>
                 setActiveCategory(activeCategory === key ? null : key)
               }
             >
               {name}
-              <span className="ml-1 opacity-60">{count}</span>
+              <span className="ml-1.5 opacity-60">{count}</span>
             </button>
           ))}
         </div>
@@ -276,18 +280,18 @@ export default function SkillsPage() {
       <section className="flex flex-col gap-3">
 
         {filteredSkills.length === 0 ? (
-          <Card>
+          <Card className="shadow-sm">
             <CardContent className="py-12 text-center text-sm text-muted-foreground">
               {skills.length === 0
-                ? "No skills found. Skills are loaded from ~/.hermes/skills/"
-                : "No skills match your search or filter."}
+                ? "未找到技能。技能从 ~/.hermes/skills/ 加载"
+                : "没有符合搜索或筛选条件的技能。"}
             </CardContent>
           </Card>
         ) : (
           categoryGroups.map(({ key, name, skills: catSkills, enabledCount: catEnabled }) => {
             const collapsed = isCollapsed(key);
             return (
-              <Card key={key}>
+              <Card key={key} className="shadow-sm hover:shadow-md transition-all duration-150">
                 <CardHeader
                   className="cursor-pointer select-none py-3 px-4"
                   onClick={() => toggleCollapse(key)}
@@ -299,7 +303,7 @@ export default function SkillsPage() {
                       ) : (
                         <ChevronDown className="h-4 w-4 text-muted-foreground" />
                       )}
-                      <CardTitle className="text-sm font-medium">{name}</CardTitle>
+                      <CardTitle className="text-sm font-medium text-foreground">{name}</CardTitle>
                       <Badge variant="secondary" className="text-[10px] font-normal">
                         {catSkills.length} skill{catSkills.length !== 1 ? "s" : ""}
                       </Badge>
@@ -316,7 +320,7 @@ export default function SkillsPage() {
                 {collapsed ? (
                   /* Peek: show first few skill names so collapsed isn't blank */
                   <div className="px-4 pb-3 flex items-center min-h-[28px]">
-                    <p className="text-xs text-muted-foreground/60 truncate leading-normal">
+                    <p className="text-xs text-muted-foreground truncate leading-normal">
                       {catSkills.slice(0, 4).map((s) => s.name).join(", ")}
                       {catSkills.length > 4 && `, +${catSkills.length - 4} more`}
                     </p>
@@ -327,7 +331,7 @@ export default function SkillsPage() {
                       {catSkills.map((skill) => (
                         <div
                           key={skill.name}
-                          className="group flex items-start gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-muted/40"
+                          className="group flex items-start gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-muted/50"
                         >
                           <div className="pt-0.5 shrink-0">
                             <Switch
@@ -340,7 +344,7 @@ export default function SkillsPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-0.5">
                               <span
-                                className={`font-mono-ui text-sm ${
+                                className={`font-mono text-sm ${
                                   skill.enabled
                                     ? "text-foreground"
                                     : "text-muted-foreground"
@@ -350,7 +354,7 @@ export default function SkillsPage() {
                               </span>
                             </div>
                             <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                              {skill.description || "No description available."}
+                              {skill.description || "暂无描述。"}
                             </p>
                           </div>
                         </div>
@@ -366,13 +370,16 @@ export default function SkillsPage() {
 
       {/* ═══════════════ Toolsets ═══════════════ */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-          <Wrench className="h-4 w-4" />
-          Toolsets ({filteredToolsets.length})
+        <h2 className="text-sm font-medium text-foreground flex items-center gap-2">
+          <Wrench className="h-4 w-4 text-muted-foreground" />
+          Toolsets
+          <span className="text-xs text-muted-foreground font-normal">
+            ({filteredToolsets.length})
+          </span>
         </h2>
 
         {filteredToolsets.length === 0 ? (
-          <Card>
+          <Card className="shadow-sm">
             <CardContent className="py-8 text-center text-sm text-muted-foreground">
               No toolsets match the search.
             </CardContent>
@@ -385,25 +392,25 @@ export default function SkillsPage() {
               const emoji = ts.label.match(/^[\p{Emoji}]+/u)?.[0] || "🔧";
 
               return (
-                <Card key={ts.name} className="relative overflow-hidden">
+                <Card key={ts.name} className="relative overflow-hidden shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-150">
                   <CardContent className="py-4">
                     <div className="flex items-start gap-3">
                       <div className="text-2xl shrink-0 leading-none mt-0.5">{emoji}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-sm">{labelText}</span>
+                          <span className="font-medium text-sm text-foreground">{labelText}</span>
                           <Badge
                             variant={ts.enabled ? "success" : "outline"}
                             className="text-[10px]"
                           >
-                            {ts.enabled ? "active" : "inactive"}
+                            {ts.enabled ? "启用" : "停用"}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground mb-2">
+                        <p className="text-xs text-muted-foreground mb-2 leading-relaxed">
                           {ts.description}
                         </p>
                         {ts.enabled && !ts.configured && (
-                          <p className="text-[10px] text-amber-300/80 mb-2">
+                          <p className="text-[10px] text-amber-600 mb-2 font-medium">
                             Setup needed
                           </p>
                         )}
@@ -421,8 +428,8 @@ export default function SkillsPage() {
                           </div>
                         )}
                         {ts.tools.length === 0 && (
-                          <span className="text-[10px] text-muted-foreground/60">
-                            {ts.enabled ? `${ts.name} toolset` : "Disabled for CLI"}
+                          <span className="text-[10px] text-muted-foreground">
+                            {ts.enabled ? `${ts.name} toolset` : "命令行模式下已禁用"}
                           </span>
                         )}
                       </div>

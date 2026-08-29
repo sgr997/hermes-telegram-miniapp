@@ -95,7 +95,7 @@ export default function ConfigPage() {
       api
         .getConfigRaw()
         .then((resp) => setYamlText(resp.yaml))
-        .catch(() => showToast("Failed to load raw config", "error"))
+        .catch(() => showToast("原始配置加载失败", "error"))
         .finally(() => setYamlLoading(false));
     }
   }, [yamlMode]);
@@ -152,7 +152,7 @@ export default function ConfigPage() {
     setSaving(true);
     try {
       await api.saveConfig(config);
-      showToast("Configuration saved", "success");
+      showToast("配置已保存", "success");
     } catch (e) {
       showToast(`Failed to save: ${e}`, "error");
     } finally {
@@ -164,7 +164,7 @@ export default function ConfigPage() {
     setYamlSaving(true);
     try {
       await api.saveConfigRaw(yamlText);
-      showToast("YAML config saved", "success");
+      showToast("YAML 配置已保存", "success");
       api.getConfig().then(setConfig).catch(() => {});
     } catch (e) {
       showToast(`Failed to save YAML: ${e}`, "error");
@@ -196,9 +196,9 @@ export default function ConfigPage() {
       try {
         const imported = JSON.parse(reader.result as string);
         setConfig(imported);
-        showToast("Config imported — review and save", "success");
+        showToast("配置已导入 — 请检查并保存", "success");
       } catch {
-        showToast("Invalid JSON file", "error");
+        showToast("无效的 JSON 文件", "error");
       }
     };
     reader.readAsText(file);
@@ -208,7 +208,7 @@ export default function ConfigPage() {
   if (!config || !schema) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -230,11 +230,11 @@ export default function ConfigPage() {
         <div key={key}>
           {showCatBadge && (
             <div className="flex items-center gap-2 pt-4 pb-2 first:pt-0">
-              <span className="text-base">{CATEGORY_ICONS[cat] || "📄"}</span>
+              <span className="text-sm">{CATEGORY_ICONS[cat] || "📄"}</span>
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {prettyCategoryName(cat)}
               </span>
-              <div className="flex-1 border-t border-border" />
+              <div className="flex-1 h-px bg-border" />
             </div>
           )}
           {showSection && (
@@ -242,7 +242,7 @@ export default function ConfigPage() {
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 {section.replace(/_/g, " ")}
               </span>
-              <div className="flex-1 border-t border-border" />
+              <div className="flex-1 h-px bg-border" />
             </div>
           )}
           <div className="py-1">
@@ -266,19 +266,19 @@ export default function ConfigPage() {
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2 min-w-0">
           <Settings2 className="h-4 w-4 text-muted-foreground shrink-0" />
-          <code className="text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded truncate">
+          <code className="text-xs text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-md truncate font-mono">
             config.yaml
           </code>
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
-          <Button variant="ghost" size="sm" onClick={handleExport} title="Export config as JSON" aria-label="Export config">
+          <Button variant="ghost" size="sm" onClick={handleExport} title="导出配置为 JSON" aria-label="导出配置" className="transition-all duration-150 ease hover:-translate-y-px">
             <Download className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} title="Import config from JSON" aria-label="Import config">
+          <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} title="从 JSON 导入配置" aria-label="导入配置" className="transition-all duration-150 ease hover:-translate-y-px">
             <Upload className="h-3.5 w-3.5" />
           </Button>
           <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
-          <Button variant="ghost" size="sm" onClick={handleReset} title="Reset to defaults" aria-label="Reset to defaults">
+          <Button variant="ghost" size="sm" onClick={handleReset} title="恢复默认设置" aria-label="Reset to defaults" className="transition-all duration-150 ease hover:-translate-y-px">
             <RotateCcw className="h-3.5 w-3.5" />
           </Button>
 
@@ -288,7 +288,7 @@ export default function ConfigPage() {
             variant={yamlMode ? "default" : "outline"}
             size="sm"
             onClick={() => setYamlMode(!yamlMode)}
-            className="gap-1.5"
+            className="gap-1.5 transition-all duration-150 ease hover:-translate-y-px"
           >
             {yamlMode ? (
               <>
@@ -304,12 +304,12 @@ export default function ConfigPage() {
           </Button>
 
           {yamlMode ? (
-            <Button size="sm" onClick={handleYamlSave} disabled={yamlSaving} className="gap-1.5">
+            <Button size="sm" onClick={handleYamlSave} disabled={yamlSaving} className="gap-1.5 transition-all duration-150 ease hover:-translate-y-px">
               <Save className="h-3.5 w-3.5" />
-              {yamlSaving ? "Saving..." : "Save"}
+              {yamlSaving ? "保存中..." : "保存"}
             </Button>
           ) : (
-            <Button size="sm" onClick={handleSave} disabled={saving} className="gap-1.5">
+            <Button size="sm" onClick={handleSave} disabled={saving} className="gap-1.5 transition-all duration-150 ease hover:-translate-y-px">
               <Save className="h-3.5 w-3.5" />
               {saving ? "Saving..." : "Save"}
             </Button>
@@ -319,9 +319,9 @@ export default function ConfigPage() {
 
       {/* ═══════════════ YAML Mode ═══════════════ */}
       {yamlMode ? (
-        <Card>
+        <Card className="transition-all duration-150 ease hover:shadow-md">
           <CardHeader className="py-3 px-4">
-            <CardTitle className="text-sm flex items-center gap-2">
+            <CardTitle className="text-sm flex items-center gap-2 font-sans">
               <FileText className="h-4 w-4" />
               Raw YAML Configuration
             </CardTitle>
@@ -333,7 +333,7 @@ export default function ConfigPage() {
               </div>
             ) : (
               <textarea
-                className="flex min-h-[600px] w-full bg-transparent px-4 py-3 text-sm font-mono leading-relaxed placeholder:text-muted-foreground focus-visible:outline-none border-t border-border"
+                className="flex min-h-[600px] w-full bg-transparent px-4 py-3 text-sm font-mono leading-relaxed placeholder:text-muted-foreground focus-visible:outline-none border-t border-border resize-y"
                 value={yamlText}
                 onChange={(e) => setYamlText(e.target.value)}
                 spellCheck={false}
@@ -343,7 +343,7 @@ export default function ConfigPage() {
         </Card>
       ) : (
         /* ═══════════════ Form Mode ═══════════════ */
-        <div className="flex flex-col lg:flex-row gap-4" style={{ minHeight: "calc(100vh - 180px)" }}>
+        <div className="flex flex-col lg:flex-row gap-4" style={{ minHeight: "calc(var(--tg-viewport-height) - 180px)" }}>
           {/* ---- Sidebar: horizontal scroll on mobile, sticky sidebar on desktop ---- */}
           <div className="lg:w-52 shrink-0">
             {/* Mobile: horizontal scrolling pills */}
@@ -352,15 +352,15 @@ export default function ConfigPage() {
               <div className="relative shrink-0">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
-                  className="pl-8 h-8 text-xs w-32"
-                  placeholder="Search..."
+                  className="pl-8 h-8 text-xs w-32 rounded-md"
+                  placeholder="搜索..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 {searchQuery && (
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-all duration-150 ease"
                     onClick={() => setSearchQuery("")}
                   >
                     <X className="h-3 w-3" />
@@ -374,7 +374,7 @@ export default function ConfigPage() {
                     key={cat}
                     type="button"
                     onClick={() => { setSearchQuery(""); setActiveCategory(cat); }}
-                    className={`shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-colors cursor-pointer border ${
+                    className={`shrink-0 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs transition-all duration-150 ease cursor-pointer border ${
                       isActive
                         ? "bg-primary/10 text-primary border-primary/30 font-medium"
                         : "text-muted-foreground hover:text-foreground border-border hover:bg-muted/50"
@@ -397,7 +397,7 @@ export default function ConfigPage() {
                 <div className="relative mb-2">
                   <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <Input
-                    className="pl-8 h-8 text-xs"
+                    className="pl-8 h-8 text-xs rounded-md"
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -405,7 +405,7 @@ export default function ConfigPage() {
                   {searchQuery && (
                     <button
                       type="button"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-all duration-150 ease"
                       onClick={() => setSearchQuery("")}
                     >
                       <X className="h-3 w-3" />
@@ -424,7 +424,7 @@ export default function ConfigPage() {
                         setSearchQuery("");
                         setActiveCategory(cat);
                       }}
-                      className={`group flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs transition-colors cursor-pointer ${
+                      className={`group flex items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs transition-all duration-150 ease cursor-pointer ${
                         isActive
                           ? "bg-primary/10 text-primary font-medium"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -449,10 +449,10 @@ export default function ConfigPage() {
           <div className="flex-1 min-w-0">
             {isSearching ? (
               /* Search results */
-              <Card>
+              <Card className="transition-all duration-150 ease hover:shadow-md">
                 <CardHeader className="py-3 px-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm flex items-center gap-2">
+                    <CardTitle className="text-sm flex items-center gap-2 font-sans">
                       <Search className="h-4 w-4" />
                       Search Results
                     </CardTitle>
@@ -473,10 +473,10 @@ export default function ConfigPage() {
               </Card>
             ) : (
               /* Active category */
-              <Card>
+              <Card className="transition-all duration-150 ease hover:shadow-md">
                 <CardHeader className="py-3 px-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm flex items-center gap-2">
+                    <CardTitle className="text-sm flex items-center gap-2 font-sans">
                       <span className="text-base">{CATEGORY_ICONS[activeCategory] || "📄"}</span>
                       {prettyCategoryName(activeCategory)}
                     </CardTitle>

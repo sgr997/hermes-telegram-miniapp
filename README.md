@@ -1,6 +1,30 @@
 # Hermes Telegram Mini App
 
-A sleek, terminal-style web interface for your Hermes agent that runs inside Telegram as a Mini App. Chat with your agent, manage cron jobs, and monitor system health — all from a dark-mode TUI that feels like home.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+[English](README.md) · [简体中文](README.zh-CN.md)
+
+A sleek, terminal-style web interface for your Hermes agent that runs inside Telegram as a Mini App. Chat with your agent, manage cron jobs, and monitor system health — all from a light, mobile-first UI designed for daily phone use.
+
+> **This is a fork of [clawvader-tech/hermes-telegram-miniapp](https://github.com/clawvader-tech/hermes-telegram-miniapp)**, focused on **mobile-first layout** and **Chinese localization**. See [Changes in this fork](#changes-in-this-fork) below. The upstream README (setup, auth, security) still applies; the fork keeps all functionality and only changes the UI layer.
+
+## Changes in this fork
+
+- **Light UI redesign**: `#fafafa` background, white cards, indigo accent, system font stack. Dropped the decorative noise-overlay / warm-glow / display-font classes
+- **Mobile-first layout**: slide-in drawer sidebar on phones (hamburger button + overlay), static column on desktop; no horizontal overflow at 375px; forms and grids stack vertically on small screens; touch targets ≥ 40px
+- **Chinese localization (zh-CN)**: navigation, titles, labels, buttons and status text translated to Chinese. API values stay in English (`job.state === "paused"` etc.) — only the display layer is localized, so comparisons and backend requests are unaffected
+- **Telegram viewport fix**: the chat page's top context bar was invisible until the keyboard opened. Root cause: `100vh` inside a Telegram Mini App resolves to the full browser viewport, and `min-h-screen` + a child `calc(100vh - 4rem)` double-counted the height. Fix: `main.tsx` publishes Telegram's `viewportStableHeight` as the CSS var `--tg-viewport-height` and the app root becomes a fixed-height flex column (`overflow-hidden` + `min-h-0` children). Chat page scrolls internally, other pages scroll in `<main>`
+
+The upstream README below covers setup, auth and security — it still applies unchanged. If you ever pull upstream into this branch, the only conflict area is `web/src/`.
+
+## Screenshots
+
+<p float="left">
+  <img src="docs/screenshots/chat.jpg" width="280" alt="对话页" />
+  <img src="docs/screenshots/cron.jpg" width="280" alt="定时任务页" />
+  <img src="docs/screenshots/analytics.jpg" width="280" alt="数据分析页" />
+  <img src="docs/screenshots/page4.jpg" width="280" alt="其他页面" />
+</p>
 
 ## What you get
 
@@ -49,8 +73,8 @@ Before you start, you'll need:
 ### Step 3: Clone and build
 
 ```bash
-# Clone the miniapp repo
-git clone https://github.com/clawvader-tech/hermes-telegram-miniapp.git
+# Clone THIS fork (the upstream repo is dark-mode; this fork is the light/mobile/Chinese version)
+git clone https://github.com/sgr997/hermes-telegram-miniapp.git
 cd hermes-telegram-miniapp
 
 # Build the frontend
@@ -264,7 +288,7 @@ If you run `hermes update` and the mini app stops working (401 errors, missing f
 
 This should not happen if the post-merge hook is installed. If it does:
 
-1. Redeploy: `cd ~/projects/telegram-miniapp-v2 && ./deploy.sh`
+1. Redeploy: `cd <your-miniapp-repo> && ./deploy.sh`
 2. Reinstall the hook: `./deploy.sh --install-hook`
 3. Restart the server after redeploying
 
@@ -285,7 +309,7 @@ Cloudflare Tunnel (or any HTTPS reverse proxy)
     │
     ▼
 FastAPI Web Server (port 9119)
-    ├─ Dual auth: Ed25519 (primary) + HMAC-SHA256 (fallback)
+    ├─ Dual auth: HMAC-SHA256 (primary) + Ed25519 (fallback)
     ├─ Owner-only access control
     ├─ Serves mini app static files from hermes_cli/web_dist/
     ├─ Multimodal chat (images, PDFs, text files)
@@ -298,7 +322,7 @@ FastAPI Web Server (port 9119)
     └─ SSE streaming for chat responses
 
 Standalone Project Repo
-    ├─ Source: ~/projects/telegram-miniapp-v2/
+    ├─ Source: this repo (clone via Step 3)
     ├─ Deploy: ./deploy.sh → copies to hermes-agent installation
     └─ Protected: assume-unchanged flag prevents git pull overwrites
 
@@ -335,6 +359,16 @@ Found a bug? Have an idea? Contributions are welcome.
 2. Make your changes (frontend in `web/`, backend in `hermes_cli/web_server.py`)
 3. Build the frontend: `cd web && npm run build`
 4. Open a PR
+
+For UI work, a dev server with hot reload is available (it proxies API calls to the backend on port 9119):
+
+```bash
+cd web && npm run dev
+```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ## License
 

@@ -22,17 +22,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const ROLE_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  user: { bg: "bg-primary/10", text: "text-primary", label: "User" },
-  assistant: { bg: "bg-success/10", text: "text-success", label: "Assistant" },
-  system: { bg: "bg-muted", text: "text-muted-foreground", label: "System" },
-  tool: { bg: "bg-warning/10", text: "text-warning", label: "Tool" },
+  user: { bg: "bg-primary/5", text: "text-primary", label: "用户" },
+  assistant: { bg: "bg-success/5", text: "text-success", label: "助手" },
+  system: { bg: "bg-muted/50", text: "text-muted-foreground", label: "系统" },
+  tool: { bg: "bg-warning/5", text: "text-warning", label: "工具" },
 };
 
 const SOURCE_CONFIG: Record<string, { icon: typeof Terminal; color: string }> = {
   cli: { icon: Terminal, color: "text-primary" },
-  telegram: { icon: MessageCircle, color: "text-[oklch(0.65_0.15_250)]" },
-  discord: { icon: Hash, color: "text-[oklch(0.65_0.15_280)]" },
-  slack: { icon: MessageSquare, color: "text-[oklch(0.7_0.15_155)]" },
+  telegram: { icon: MessageCircle, color: "text-blue-600" },
+  discord: { icon: Hash, color: "text-indigo-500" },
+  slack: { icon: MessageSquare, color: "text-emerald-600" },
   whatsapp: { icon: Globe, color: "text-success" },
   cron: { icon: Clock, color: "text-warning" },
 };
@@ -50,7 +50,7 @@ function SnippetHighlight({ snippet }: { snippet: string }) {
       parts.push(snippet.slice(last, match.index));
     }
     parts.push(
-      <mark key={i++} className="bg-warning/30 text-warning rounded-sm px-0.5">
+      <mark key={i++} className="bg-warning/20 text-warning-foreground rounded px-0.5">
         {match[1]}
       </mark>
     );
@@ -60,7 +60,7 @@ function SnippetHighlight({ snippet }: { snippet: string }) {
     parts.push(snippet.slice(last));
   }
   return (
-    <p className="text-xs text-muted-foreground/80 truncate max-w-lg mt-0.5">
+    <p className="text-xs text-muted-foreground truncate max-w-lg mt-0.5">
       {parts}
     </p>
   );
@@ -77,19 +77,19 @@ function ToolCallBlock({ toolCall }: { toolCall: { id: string; function: { name:
   }
 
   return (
-    <div className="mt-2 rounded-md border border-warning/20 bg-warning/5">
+    <div className="mt-2 rounded-lg border border-warning/20 bg-warning/5">
       <button
         type="button"
         className="flex w-full items-center gap-2 px-3 py-2 text-xs text-warning cursor-pointer hover:bg-warning/10 transition-colors"
         onClick={() => setOpen(!open)}
-        aria-label={`${open ? "Collapse" : "Expand"} tool call ${toolCall.function.name}`}
+        aria-label={`${open ? "收起" : "展开"} tool call ${toolCall.function.name}`}
       >
         {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-        <span className="font-mono-ui font-medium">{toolCall.function.name}</span>
-        <span className="text-warning/50 ml-auto">{toolCall.id}</span>
+        <span className="font-mono font-medium">{toolCall.function.name}</span>
+        <span className="text-warning/60 ml-auto">{toolCall.id}</span>
       </button>
       {open && (
-        <pre className="border-t border-warning/20 px-3 py-2 text-xs text-warning/80 overflow-x-auto whitespace-pre-wrap font-mono">
+        <pre className="border-t border-warning/20 px-3 py-2 text-xs text-foreground/80 overflow-x-auto whitespace-pre-wrap font-mono">
           {args}
         </pre>
       )}
@@ -115,7 +115,7 @@ function MessageBubble({ msg, highlight }: { msg: SessionMessage; highlight?: st
     : undefined;
 
   return (
-    <div className={`${style.bg} p-3 ${isHit ? "ring-1 ring-warning/40" : ""}`} data-search-hit={isHit || undefined}>
+    <div className={`${style.bg} rounded-lg p-3 ${isHit ? "ring-1 ring-warning/40" : ""}`} data-search-hit={isHit || undefined}>
       <div className="flex items-center gap-2 mb-1">
         <span className={`text-xs font-semibold ${style.text}`}>{label}</span>
         {isHit && (
@@ -198,16 +198,16 @@ function SessionRow({
 
   const sourceInfo = (session.source ? SOURCE_CONFIG[session.source] : null) ?? { icon: Globe, color: "text-muted-foreground" };
   const SourceIcon = sourceInfo.icon;
-  const hasTitle = session.title && session.title !== "Untitled";
+  const hasTitle = session.title && session.title !== "未命名";
 
   return (
-    <div className={`border overflow-hidden transition-colors ${
+    <div className={`rounded-lg border overflow-hidden transition-all hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${
       session.is_active
         ? "border-success/30 bg-success/[0.03]"
-        : "border-border"
+        : "border-border bg-card hover:border-primary/40"
     }`}>
       <div
-        className="flex items-center justify-between p-3 cursor-pointer hover:bg-secondary/30 transition-colors"
+        className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/30 transition-colors"
         onClick={onToggle}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -216,8 +216,8 @@ function SessionRow({
           </div>
           <div className="flex flex-col gap-0.5 min-w-0">
             <div className="flex items-center gap-2">
-              <span className={`text-sm truncate pr-2 ${hasTitle ? "font-medium" : "text-muted-foreground italic"}`}>
-                {hasTitle ? session.title : (session.preview ? session.preview.slice(0, 60) : "Untitled session")}
+              <span className={`text-sm truncate pr-2 ${hasTitle ? "font-medium text-foreground" : "text-muted-foreground italic"}`}>
+                {hasTitle ? session.title : (session.preview ? session.preview.slice(0, 60) : "未命名会话")}
               </span>
               {session.is_active && (
                 <Badge variant="success" className="text-[10px] shrink-0">
@@ -227,7 +227,7 @@ function SessionRow({
               )}
             </div>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="truncate max-w-[180px]">{(session.model ?? "unknown").split("/").pop()}</span>
+              <span className="truncate max-w-[180px]">{(session.model ?? "未知").split("/").pop()}</span>
               <span className="text-border">&#183;</span>
               <span>{session.message_count} msgs</span>
               {session.tool_call_count > 0 && (
@@ -253,7 +253,7 @@ function SessionRow({
             variant="ghost"
             size="icon"
             className="h-7 w-7 text-muted-foreground hover:text-destructive"
-            aria-label="Delete session"
+            aria-label="删除会话"
             onClick={(e) => {
               e.stopPropagation();
               onDelete();
@@ -265,7 +265,7 @@ function SessionRow({
       </div>
 
       {isExpanded && (
-        <div className="border-t border-border bg-background/50 p-4">
+        <div className="border-t border-border bg-muted/30 p-4">
           {loading && (
             <div className="flex items-center justify-center py-8">
               <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -377,7 +377,7 @@ export default function SessionsPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MessageSquare className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-base font-semibold">Sessions</h1>
+          <h1 className="text-base font-semibold text-foreground">Sessions</h1>
           <Badge variant="secondary" className="text-xs">
             {total}
           </Badge>
@@ -389,7 +389,7 @@ export default function SessionsPage() {
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           )}
           <Input
-            placeholder="Search message content..."
+            placeholder="搜索消息内容..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-8 pr-7 h-8 text-xs"
@@ -410,7 +410,7 @@ export default function SessionsPage() {
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <Clock className="h-8 w-8 mb-3 opacity-40" />
           <p className="text-sm font-medium">
-            {search ? "No sessions match your search" : "No sessions yet"}
+            {search ? "没有符合搜索条件的会话" : "还没有会话"}
           </p>
           {!search && (
             <p className="text-xs mt-1 text-muted-foreground/60">Start a conversation to see it here</p>
@@ -447,7 +447,7 @@ export default function SessionsPage() {
                   className="h-7 w-7 p-0"
                   disabled={page === 0}
                   onClick={() => setPage((p) => p - 1)}
-                  aria-label="Previous page"
+                  aria-label="上一页"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -460,7 +460,7 @@ export default function SessionsPage() {
                   className="h-7 w-7 p-0"
                   disabled={(page + 1) * PAGE_SIZE >= total}
                   onClick={() => setPage((p) => p + 1)}
-                  aria-label="Next page"
+                  aria-label="下一页"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>

@@ -45,13 +45,13 @@ function SummaryCard({
   sub?: string;
 }) {
   return (
-    <Card>
+    <Card className="transition-all hover:shadow-sm hover:border-primary/40">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">{label}</CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
         <Icon className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
+        <div className="text-2xl font-bold text-foreground">{value}</div>
         {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
       </CardContent>
     </Card>
@@ -64,15 +64,15 @@ function TokenBarChart({ daily }: { daily: AnalyticsDailyEntry[] }) {
   const maxTokens = Math.max(...daily.map((d) => d.input_tokens + d.output_tokens), 1);
 
   return (
-    <Card>
+    <Card className="transition-all hover:shadow-sm hover:border-primary/40">
       <CardHeader>
         <div className="flex items-center gap-2">
           <BarChart3 className="h-5 w-5 text-muted-foreground" />
           <CardTitle className="text-base">Daily Token Usage</CardTitle>
         </div>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <div className="h-2.5 w-2.5 rounded-sm bg-[#ffe6cb]" />
+            <div className="h-2.5 w-2.5 rounded-sm bg-indigo-500" />
             Input
           </div>
           <div className="flex items-center gap-1.5">
@@ -95,7 +95,7 @@ function TokenBarChart({ daily }: { daily: AnalyticsDailyEntry[] }) {
               >
                 {/* Tooltip */}
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 pointer-events-none">
-                  <div className="rounded-md bg-card border border-border px-2.5 py-1.5 text-[10px] text-foreground shadow-lg whitespace-nowrap">
+                  <div className="rounded-md bg-card border border-border px-2.5 py-1.5 text-[10px] text-foreground shadow-sm whitespace-nowrap">
                     <div className="font-medium">{formatDate(d.day)}</div>
                     <div>Input: {formatTokens(d.input_tokens)}</div>
                     <div>Output: {formatTokens(d.output_tokens)}</div>
@@ -104,12 +104,12 @@ function TokenBarChart({ daily }: { daily: AnalyticsDailyEntry[] }) {
                 </div>
                 {/* Input bar */}
                 <div
-                  className="w-full bg-[#ffe6cb]/70"
+                  className="w-full bg-indigo-500/70 rounded-t-sm"
                   style={{ height: Math.max(inputH, total > 0 ? 1 : 0) }}
                 />
                 {/* Output bar */}
                 <div
-                  className="w-full bg-emerald-500/70"
+                  className="w-full bg-emerald-500/70 rounded-b-sm"
                   style={{ height: Math.max(outputH, d.output_tokens > 0 ? 1 : 0) }}
                 />
               </div>
@@ -135,7 +135,7 @@ function DailyTable({ daily }: { daily: AnalyticsDailyEntry[] }) {
   const sorted = [...daily].reverse();
 
   return (
-    <Card>
+    <Card className="transition-all hover:shadow-sm hover:border-primary/40">
       <CardHeader>
         <div className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-muted-foreground" />
@@ -156,14 +156,14 @@ function DailyTable({ daily }: { daily: AnalyticsDailyEntry[] }) {
             <tbody>
               {sorted.map((d) => {
                 return (
-                  <tr key={d.day} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
-                    <td className="py-2 pr-4 font-medium">{formatDate(d.day)}</td>
+                  <tr key={d.day} className="border-b border-border/50 hover:bg-muted/40 transition-colors">
+                    <td className="py-2 pr-4 font-medium text-foreground">{formatDate(d.day)}</td>
                     <td className="text-right py-2 px-4 text-muted-foreground">{d.sessions}</td>
                     <td className="text-right py-2 px-4">
-                      <span className="text-[#ffe6cb]">{formatTokens(d.input_tokens)}</span>
+                      <span className="text-indigo-600">{formatTokens(d.input_tokens)}</span>
                     </td>
                     <td className="text-right py-2 pl-4">
-                      <span className="text-emerald-400">{formatTokens(d.output_tokens)}</span>
+                      <span className="text-emerald-600">{formatTokens(d.output_tokens)}</span>
                     </td>
                   </tr>
                 );
@@ -184,7 +184,7 @@ function ModelTable({ models }: { models: AnalyticsModelEntry[] }) {
   );
 
   return (
-    <Card>
+    <Card className="transition-all hover:shadow-sm hover:border-primary/40">
       <CardHeader>
         <div className="flex items-center gap-2">
           <Cpu className="h-5 w-5 text-muted-foreground" />
@@ -203,15 +203,15 @@ function ModelTable({ models }: { models: AnalyticsModelEntry[] }) {
             </thead>
             <tbody>
               {sorted.map((m) => (
-                <tr key={m.model} className="border-b border-border/50 hover:bg-secondary/20 transition-colors">
+                <tr key={m.model} className="border-b border-border/50 hover:bg-muted/40 transition-colors">
                   <td className="py-2 pr-4">
-                    <span className="font-mono-ui text-xs">{m.model}</span>
+                    <span className="font-mono text-xs text-foreground">{m.model}</span>
                   </td>
                   <td className="text-right py-2 px-4 text-muted-foreground">{m.sessions}</td>
                   <td className="text-right py-2 pl-4">
-                    <span className="text-[#ffe6cb]">{formatTokens(m.input_tokens)}</span>
+                    <span className="text-indigo-600">{formatTokens(m.input_tokens)}</span>
                     {" / "}
-                    <span className="text-emerald-400">{formatTokens(m.output_tokens)}</span>
+                    <span className="text-emerald-600">{formatTokens(m.output_tokens)}</span>
                   </td>
                 </tr>
               ))}
@@ -281,19 +281,19 @@ export default function AnalyticsPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <SummaryCard
               icon={Hash}
-              label="Total Tokens"
+              label="总 Token 数"
               value={formatTokens(data.totals.total_input + data.totals.total_output)}
               sub={`${formatTokens(data.totals.total_input)} in / ${formatTokens(data.totals.total_output)} out`}
             />
             <SummaryCard
               icon={BarChart3}
-              label="Total Sessions"
+              label="总会话数"
               value={String(data.totals.total_sessions)}
               sub={`~${(data.totals.total_sessions / days).toFixed(1)}/day avg`}
             />
             <SummaryCard
               icon={TrendingUp}
-              label="API Calls"
+              label="API 调用次数"
               value={String(data.daily.reduce((sum, d) => sum + d.sessions, 0))}
               sub={`across ${data.by_model.length} models`}
             />

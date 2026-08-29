@@ -11,8 +11,8 @@ function FieldHint({ schema, schemaKey }: { schema: Record<string, unknown>; sch
 
   return (
     <div className="flex flex-col gap-0.5">
-      {keyPath && <span className="text-[10px] font-mono text-muted-foreground/50 break-all">{keyPath}</span>}
-      {description && <span className="text-xs text-muted-foreground/70">{description}</span>}
+      {keyPath && <span className="text-[10px] font-mono text-muted-foreground/60 break-all">{keyPath}</span>}
+      {description && <span className="text-xs text-muted-foreground">{description}</span>}
     </div>
   );
 }
@@ -30,7 +30,7 @@ export function AutoField({
     return (
       <div className="flex items-center justify-between gap-4">
         <div className="flex flex-col gap-0.5 min-w-0">
-          <Label className="text-sm">{label}</Label>
+          <Label className="text-sm font-medium text-foreground">{label}</Label>
           <FieldHint schema={schema} schemaKey={schemaKey} />
         </div>
         <Switch checked={!!value} onCheckedChange={onChange} className="shrink-0" />
@@ -42,12 +42,12 @@ export function AutoField({
     const options = (schema.options as string[]) ?? [];
     return (
       <div className="grid gap-1.5">
-        <Label className="text-sm">{label}</Label>
+        <Label className="text-sm font-medium text-foreground">{label}</Label>
         <FieldHint schema={schema} schemaKey={schemaKey} />
         <Select value={String(value ?? "")} onChange={(e) => onChange(e.target.value)}>
           {options.map((opt) => (
             <option key={opt} value={opt}>
-              {opt || "(none)"}
+              {opt || "(无)"}
             </option>
           ))}
         </Select>
@@ -58,7 +58,7 @@ export function AutoField({
   if (schema.type === "number") {
     return (
       <div className="grid gap-1.5">
-        <Label className="text-sm">{label}</Label>
+        <Label className="text-sm font-medium text-foreground">{label}</Label>
         <FieldHint schema={schema} schemaKey={schemaKey} />
         <Input
           type="number"
@@ -78,10 +78,10 @@ export function AutoField({
   if (schema.type === "text") {
     return (
       <div className="grid gap-1.5">
-        <Label className="text-sm">{label}</Label>
+        <Label className="text-sm font-medium text-foreground">{label}</Label>
         <FieldHint schema={schema} schemaKey={schemaKey} />
         <textarea
-          className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-y"
+          className="flex min-h-[60px] w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground shadow-sm transition-all duration-150 ease placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary resize-y"
           value={String(value ?? "")}
           onChange={(e) => onChange(e.target.value)}
         />
@@ -92,7 +92,7 @@ export function AutoField({
   if (schema.type === "list") {
     return (
       <div className="grid gap-1.5">
-        <Label className="text-sm">{label}</Label>
+        <Label className="text-sm font-medium text-foreground">{label}</Label>
         <FieldHint schema={schema} schemaKey={schemaKey} />
         <Input
           value={Array.isArray(value) ? value.join(", ") : String(value ?? "")}
@@ -101,7 +101,7 @@ export function AutoField({
               e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
             )
           }
-          placeholder="comma-separated values"
+          placeholder="逗号分隔的值"
           className="w-full"
         />
       </div>
@@ -111,8 +111,8 @@ export function AutoField({
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     const obj = value as Record<string, unknown>;
     return (
-      <div className="grid gap-3 rounded-lg border border-border p-3">
-        <Label className="text-xs font-medium">{label}</Label>
+      <div className="grid gap-3 rounded-lg border border-border bg-card p-3 shadow-sm">
+        <Label className="text-xs font-medium text-foreground">{label}</Label>
         <FieldHint schema={schema} schemaKey={schemaKey} />
         {Object.entries(obj).map(([subKey, subVal]) => (
           <div key={subKey} className="grid gap-1">
@@ -130,7 +130,7 @@ export function AutoField({
 
   return (
     <div className="grid gap-1.5">
-      <Label className="text-sm">{label}</Label>
+      <Label className="text-sm font-medium text-foreground">{label}</Label>
       <FieldHint schema={schema} schemaKey={schemaKey} />
       <Input value={String(value ?? "")} onChange={(e) => onChange(e.target.value)} className="w-full" />
     </div>

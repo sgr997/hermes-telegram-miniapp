@@ -10,9 +10,9 @@ tags: [telegram, mini-app, dashboard, mobile, fastapi, react]
 
 ## What It Is
 
-A **Telegram Mini App** giving Hermes users a full-featured mobile dashboard: streaming AI chat, system status, cron job management, agent spawning, session browsing, analytics, logs, skills management, config editing, and API key management — 10 pages, mobile-first, dark TUI aesthetic.
+A **Telegram Mini App** giving Hermes users a full-featured mobile dashboard: streaming AI chat, system status, cron job management, agent spawning, session browsing, analytics, logs, skills management, config editing, and API key management — 10 pages, mobile-first, light UI.
 
-**Repo:** https://github.com/clawvader-tech/hermes-telegram-miniapp
+**Repo:** https://github.com/sgr997/hermes-telegram-miniapp
 
 ## Architecture
 
@@ -179,7 +179,7 @@ curl -s http://localhost:9119/api/status | python3 -m json.tool
 Give your agent this repo URL and ask it to install:
 
 ```
-https://github.com/clawvader-tech/hermes-telegram-miniapp/tree/main/.hermes/skills/hermes-telegram-miniapp/SKILL.md
+https://github.com/sgr997/hermes-telegram-miniapp/tree/ui-light-minimal/.hermes/skills/hermes-telegram-miniapp/SKILL.md
 ```
 
 Or place the `SKILL.md` at `~/.hermes/skills/hermes-telegram-miniapp/SKILL.md` on the target machine.

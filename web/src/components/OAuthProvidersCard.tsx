@@ -22,9 +22,9 @@ interface Props {
 }
 
 const FLOW_LABELS: Record<OAuthProvider["flow"], string> = {
-  pkce: "Browser login (PKCE)",
-  device_code: "Device code",
-  external: "External CLI",
+  pkce: "浏览器登录 (PKCE)",
+  device_code: "设备码",
+  external: "外部命令行",
 };
 
 function formatExpiresAt(expiresAt: string | null | undefined): string | null {
@@ -78,7 +78,7 @@ export function OAuthProvidersCard({ onError, onSuccess }: Props) {
       onSuccess?.(`Copied: ${provider.cli_command}`);
       setTimeout(() => setCopiedId((v) => (v === provider.id ? null : v)), 1500);
     } catch {
-      onError?.("Clipboard write failed — copy the command manually");
+      onError?.("剪贴板写入失败 — 请手动复制命令");
     }
   };
 
@@ -102,25 +102,25 @@ export function OAuthProvidersCard({ onError, onSuccess }: Props) {
   const totalCount = providers?.length ?? 0;
 
   return (
-    <Card>
+    <Card className="font-sans transition-all duration-150 ease-out">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-base">Provider Logins (OAuth)</CardTitle>
+            <CardTitle className="text-base font-semibold">Provider Logins (OAuth)</CardTitle>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={refresh}
             disabled={loading}
-            className="text-xs"
+            className="text-xs h-8 transition-all duration-150 ease-out hover:-translate-y-0.5"
           >
             <RefreshCw className={`h-3 w-3 mr-1 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
         </div>
-        <CardDescription>
+        <CardDescription className="text-sm text-muted-foreground leading-relaxed">
           {connectedCount} of {totalCount} OAuth providers connected. Login flows currently
           run via the CLI; click <em>Copy command</em> and paste into a terminal to set up.
         </CardDescription>
@@ -143,7 +143,7 @@ export function OAuthProvidersCard({ onError, onSuccess }: Props) {
             return (
               <div
                 key={p.id}
-                className="flex items-center justify-between gap-4 py-3"
+                className="flex items-center justify-between gap-4 py-3 transition-all duration-150 ease-out"
               >
                 {/* Left: status icon + name + source */}
                 <div className="flex items-start gap-3 min-w-0 flex-1">
@@ -154,28 +154,28 @@ export function OAuthProvidersCard({ onError, onSuccess }: Props) {
                   )}
                   <div className="flex flex-col min-w-0 gap-0.5">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm">{p.name}</span>
-                      <Badge variant="outline" className="text-[11px] uppercase tracking-wide">
+                      <span className="font-medium text-sm text-foreground">{p.name}</span>
+                      <Badge variant="outline" className="text-[11px] uppercase tracking-wide font-normal">
                         {FLOW_LABELS[p.flow]}
                       </Badge>
                       {p.status.logged_in && (
-                        <Badge variant="success" className="text-[11px]">
+                        <Badge variant="success" className="text-[11px] font-normal">
                           Connected
                         </Badge>
                       )}
                       {expiresLabel === "expired" && (
-                        <Badge variant="destructive" className="text-[11px]">
+                        <Badge variant="destructive" className="text-[11px] font-normal">
                           Expired
                         </Badge>
                       )}
                       {expiresLabel && expiresLabel !== "expired" && (
-                        <Badge variant="outline" className="text-[11px]">
+                        <Badge variant="outline" className="text-[11px] font-normal">
                           {expiresLabel}
                         </Badge>
                       )}
                     </div>
                     {p.status.logged_in && p.status.token_preview && (
-                      <code className="text-xs text-muted-foreground font-mono-ui truncate">
+                      <code className="text-xs text-muted-foreground font-mono truncate block max-w-full">
                         token{" "}
                         <span className="text-foreground">{p.status.token_preview}</span>
                         {p.status.source_label && (
@@ -188,7 +188,7 @@ export function OAuthProvidersCard({ onError, onSuccess }: Props) {
                     {!p.status.logged_in && (
                       <span className="text-xs text-muted-foreground/80">
                         Not connected. Run{" "}
-                        <code className="text-foreground bg-secondary/40 px-1 rounded">
+                        <code className="text-foreground bg-muted px-1.5 py-0.5 rounded font-mono text-[11px]">
                           {p.cli_command}
                         </code>{" "}
                         in a terminal.
@@ -211,7 +211,7 @@ export function OAuthProvidersCard({ onError, onSuccess }: Props) {
                       className="inline-flex"
                       title={`Open ${p.name} docs`}
                     >
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 transition-all duration-150 ease-out hover:-translate-y-0.5">
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Button>
                     </a>
@@ -221,7 +221,7 @@ export function OAuthProvidersCard({ onError, onSuccess }: Props) {
                       variant="default"
                       size="sm"
                       onClick={() => setLoginFor(p)}
-                      className="text-xs h-7"
+                      className="text-xs h-7 transition-all duration-150 ease-out hover:-translate-y-0.5"
                       title={`Start ${p.flow === "pkce" ? "browser" : "device code"} login`}
                     >
                       <LogIn className="h-3 w-3 mr-1" />
@@ -233,8 +233,8 @@ export function OAuthProvidersCard({ onError, onSuccess }: Props) {
                       variant="outline"
                       size="sm"
                       onClick={() => handleCopy(p)}
-                      className="text-xs h-7"
-                      title="Copy CLI command (for external / fallback)"
+                      className="text-xs h-7 transition-all duration-150 ease-out hover:-translate-y-0.5"
+                      title="复制命令行指令（用于外部/备选）"
                     >
                       {copiedId === p.id ? (
                         <>Copied ✓</>
@@ -252,7 +252,7 @@ export function OAuthProvidersCard({ onError, onSuccess }: Props) {
                       size="sm"
                       onClick={() => handleDisconnect(p)}
                       disabled={isBusy}
-                      className="text-xs h-7"
+                      className="text-xs h-7 transition-all duration-150 ease-out hover:-translate-y-0.5 disabled:opacity-50 disabled:translate-y-0"
                     >
                       {isBusy ? (
                         <RefreshCw className="h-3 w-3 mr-1 animate-spin" />

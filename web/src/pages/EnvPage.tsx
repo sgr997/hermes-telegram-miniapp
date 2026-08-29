@@ -30,7 +30,7 @@ import { Label } from "@/components/ui/label";
 /* ------------------------------------------------------------------ */
 
 const PROVIDER_GROUPS: { prefix: string; name: string; priority: number }[] = [
-  { prefix: "NOUS_",            name: "Nous Portal",       priority: 0 },
+  { prefix: "NOUS_",            name: "Nous 门户",       priority: 0 },
   { prefix: "ANTHROPIC_",       name: "Anthropic",         priority: 1 },
   { prefix: "DASHSCOPE_",       name: "DashScope",         priority: 2 },
   { prefix: "HERMES_QWEN_",    name: "DashScope",         priority: 2 },
@@ -42,19 +42,19 @@ const PROVIDER_GROUPS: { prefix: string; name: string; priority: number }[] = [
   { prefix: "Z_AI_",            name: "GLM / Z.AI",        priority: 5 },
   { prefix: "HF_",              name: "HuggingFace",       priority: 6 },
   { prefix: "KIMI_",            name: "Kimi",              priority: 7 },
-  { prefix: "MINIMAX_CN_",      name: "MiniMax (CN)",      priority: 9 },
+  { prefix: "MINIMAX_CN_",      name: "MiniMax (国内)",      priority: 9 },
   { prefix: "MINIMAX_",         name: "MiniMax",           priority: 8 },
   { prefix: "OPENCODE_GO_",     name: "OpenCode Go",       priority: 10 },
   { prefix: "OPENCODE_ZEN_",    name: "OpenCode Zen",      priority: 11 },
   { prefix: "OPENROUTER_",      name: "OpenRouter",        priority: 12 },
-  { prefix: "XIAOMI_",          name: "Xiaomi MiMo",       priority: 13 },
+  { prefix: "XIAOMI_",          name: "小米 MiMo",       priority: 13 },
 ];
 
 function getProviderGroup(key: string): string {
   for (const g of PROVIDER_GROUPS) {
     if (key.startsWith(g.prefix)) return g.name;
   }
-  return "Other";
+  return "其他";
 }
 
 function getProviderPriority(groupName: string): number {
@@ -70,10 +70,10 @@ interface ProviderGroup {
 }
 
 const CATEGORY_META: Record<string, { label: string; icon: typeof KeyRound }> = {
-  provider: { label: "LLM Providers", icon: Zap },
-  tool: { label: "Tool API Keys", icon: KeyRound },
-  messaging: { label: "Messaging", icon: MessageSquare },
-  setting: { label: "Agent Settings", icon: Settings },
+  provider: { label: "大模型提供商", icon: Zap },
+  tool: { label: "工具 API 密钥", icon: KeyRound },
+  messaging: { label: "消息平台", icon: MessageSquare },
+  setting: { label: "智能体设置", icon: Settings },
 };
 
 /* ------------------------------------------------------------------ */
@@ -135,7 +135,7 @@ function EnvVarRow({
   // Non-compact unset row — mobile-first: stack key on top, actions below
   if (!info.is_set && !isEditing) {
     return (
-      <div className="border border-border/50 px-3 py-2.5 sm:px-4 opacity-60 hover:opacity-100 transition-opacity">
+      <div className="rounded-lg border border-border bg-card px-3 py-2.5 sm:px-4 opacity-60 hover:opacity-100 transition-opacity">
         <div className="flex items-center gap-2 min-w-0 mb-1.5">
           <Label className="font-mono text-[0.7rem] text-muted-foreground truncate">{varKey}</Label>
           {info.url && (
@@ -159,11 +159,11 @@ function EnvVarRow({
 
   // Full expanded row for set keys or keys being edited — mobile-first: stack vertically
   return (
-    <div className="grid gap-2 border border-border p-3 sm:p-4">
+    <div className="grid gap-2 rounded-lg border border-border bg-card p-3 sm:p-4 transition-all hover:border-primary/40 hover:shadow-sm">
       <div className="flex items-center gap-2 min-w-0 flex-wrap">
         <Label className="font-mono text-[0.7rem] truncate">{varKey}</Label>
         <Badge variant={info.is_set ? "success" : "outline"} className="shrink-0">
-          {info.is_set ? "Set" : "Not set"}
+          {info.is_set ? "设置" : "未设置"}
         </Badge>
         {info.url && (
           <a href={info.url} target="_blank" rel="noreferrer"
@@ -186,13 +186,13 @@ function EnvVarRow({
       {!isEditing && (
         <div className="flex flex-col gap-2">
           {/* Value display — full width on mobile */}
-          <div className={`flex items-center gap-2 border border-border px-3 py-2 font-mono text-xs min-h-[38px] ${
+          <div className={`flex items-center gap-2 rounded-lg border border-border px-3 py-2 font-mono text-xs min-h-[38px] ${
             isRevealed ? "bg-background text-foreground select-all" : "bg-muted/30 text-muted-foreground"
           }`}>
             <span className="flex-1 truncate sm:whitespace-normal break-all">{info.is_set ? displayValue : "---"}</span>
             {info.is_set && (
               <Button size="sm" variant="ghost" onClick={() => onReveal(varKey)}
-                title={isRevealed ? "Hide value" : "Show real value"}
+                title={isRevealed ? "隐藏值" : "显示真实值"}
                 aria-label={isRevealed ? `Hide ${varKey}` : `Reveal ${varKey}`}
                 className="shrink-0">
                 {isRevealed
@@ -206,14 +206,14 @@ function EnvVarRow({
             <Button size="sm" variant="outline"
               onClick={() => setEdits((prev) => ({ ...prev, [varKey]: "" }))}>
               <Pencil className="h-3 w-3" />
-              {info.is_set ? "Replace" : "Set"}
+              {info.is_set ? "替换" : "设置"}
             </Button>
             {info.is_set && (
               <Button size="sm" variant="ghost"
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 onClick={() => onClear(varKey)} disabled={saving === varKey}>
                 <Trash2 className="h-3 w-3" />
-                {saving === varKey ? "..." : "Clear"}
+                {saving === varKey ? "..." : "清除"}
               </Button>
             )}
           </div>
@@ -224,13 +224,13 @@ function EnvVarRow({
         <div className="flex flex-col gap-2">
           <Input autoFocus type="text" value={edits[varKey]}
             onChange={(e) => setEdits((prev) => ({ ...prev, [varKey]: e.target.value }))}
-            placeholder={info.is_set ? `Replace current value` : "Enter value..."}
+            placeholder={info.is_set ? `Replace current value` : "输入值..."}
             className="font-mono text-xs w-full" />
           <div className="flex items-center gap-2">
             <Button size="sm" onClick={() => onSave(varKey)}
               disabled={saving === varKey || !edits[varKey]}>
               <Save className="h-3 w-3" />
-              {saving === varKey ? "..." : "Save"}
+              {saving === varKey ? "..." : "保存"}
             </Button>
             <Button size="sm" variant="ghost" onClick={() => onCancelEdit(varKey)}>
               <X className="h-3 w-3" /> Cancel
@@ -277,7 +277,7 @@ function ProviderGroupCard({
   const keyUrl = apiKeys.find(([, info]) => info.url)?.[1]?.url ?? null;
 
   return (
-    <div className="border border-border last:border-b-0">
+    <div className="border-b border-border last:border-b-0">
       {/* Header — always visible, wraps on mobile */}
       <button
         type="button"
@@ -286,7 +286,7 @@ function ProviderGroupCard({
       >
         <div className="flex items-center gap-2 min-w-0">
           {expanded ? <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" /> : <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />}
-          <span className="font-semibold text-sm tracking-wide truncate">{group.name}</span>
+          <span className="font-sans font-semibold text-sm tracking-wide truncate">{group.name}</span>
           {hasAnyConfigured && (
             <Badge variant="success" className="text-[0.6rem] shrink-0">
               {configuredCount}
@@ -309,7 +309,7 @@ function ProviderGroupCard({
 
       {/* Expanded content */}
       {expanded && (
-        <div className="border-t border-border px-3 py-3 sm:px-4 grid gap-2">
+        <div className="border-t border-border px-3 py-3 sm:px-4 grid gap-2 bg-muted/20">
           {apiKeys.map(([key, info]) => (
             <EnvVarRow
               key={key} varKey={key} info={info} compact
@@ -437,7 +437,7 @@ export default function EnvPage() {
       }))
       .sort((a, b) => a.priority - b.priority);
 
-    const otherCategories = ["tool", "messaging", "setting"];
+    const otherCategories = ["tool", "消息平台", "设置"];
     const nonProvider = otherCategories.map((cat) => {
       const entries = Object.entries(vars).filter(
         ([, info]) => info.category === cat && (showAdvanced || !info.advanced),
@@ -459,7 +459,7 @@ export default function EnvPage() {
   if (!vars) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -468,21 +468,21 @@ export default function EnvPage() {
   const configuredProviders = providerGroups.filter((g) => g.hasAnySet).length;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 font-sans">
       <Toast toast={toast} />
 
       {/* Header — mobile: stack description, keep button accessible */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-0.5 min-w-0">
           <p className="text-sm text-muted-foreground">
-            API keys stored in <code className="text-xs bg-muted/50 px-1.5 py-0.5 rounded">.env</code>
+            API keys stored in <code className="text-xs bg-muted/50 px-1.5 py-0.5 rounded font-mono">.env</code>
           </p>
           <p className="text-[0.7rem] text-muted-foreground/70">
             Saved to disk immediately. Active sessions pick up new keys automatically.
           </p>
         </div>
         <Button variant="ghost" size="sm" onClick={() => setShowAdvanced(!showAdvanced)} className="shrink-0 self-start">
-          {showAdvanced ? "Hide Advanced" : "Show Advanced"}
+          {showAdvanced ? "收起高级选项" : "展开高级选项"}
         </Button>
       </div>
 
@@ -493,7 +493,7 @@ export default function EnvPage() {
       />
 
       {/* ═══════════════ LLM Providers (grouped) ═══════════════ */}
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader className="sticky top-14 z-10 bg-card border-b border-border">
           <div className="flex items-center gap-2 min-w-0">
             <Zap className="h-5 w-5 text-muted-foreground shrink-0" />

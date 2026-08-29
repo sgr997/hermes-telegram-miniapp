@@ -63,7 +63,7 @@ export default function AgentsPage() {
     setSpawning(true);
     try {
       await api.spawnAgent({ prompt: spawnPrompt.trim(), mode: spawnMode });
-      showToast("Agent spawned", "success");
+      showToast("智能体已启动", "success");
       setSpawnPrompt("");
       setShowSpawn(false);
       loadAgents();
@@ -98,49 +98,70 @@ export default function AgentsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 font-sans">
       <Toast toast={toast} />
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Bot className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-base font-semibold">Agents</h1>
+          <Bot className="h-4 w-4 text-muted-foreground" />
+          <h1 className="text-lg font-semibold text-foreground">Agents</h1>
           <Badge variant="secondary" className="text-xs">{agents.length}</Badge>
         </div>
-        <Button size="sm" className="text-xs h-8" onClick={() => setShowSpawn(true)}>
+        <Button
+          size="sm"
+          className="text-xs h-8 transition-all duration-150 hover:-translate-y-0.5"
+          onClick={() => setShowSpawn(true)}
+        >
           <Plus className="h-3 w-3 mr-1" /> Spawn
         </Button>
       </div>
 
       {/* Spawn modal */}
       {showSpawn && (
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2"><Plus className="h-4 w-4" /> Spawn Agent</CardTitle>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowSpawn(false)}><X className="h-3 w-3" /></Button>
+              <CardTitle className="text-base flex items-center gap-2 font-semibold text-foreground">
+                <Plus className="h-4 w-4" /> Spawn Agent
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 transition-all duration-150"
+                onClick={() => setShowSpawn(false)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <textarea
-              className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              placeholder="Task prompt for the agent..."
+              className="flex min-h-[80px] w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary transition-colors duration-150 resize-none"
+              placeholder="给智能体的任务指令..."
               value={spawnPrompt}
               onChange={(e) => setSpawnPrompt(e.target.value)}
             />
             <div className="flex items-center gap-2">
-              <select className="rounded-md border border-input bg-transparent px-2 py-1 text-sm" value={spawnMode} onChange={(e) => setSpawnMode(e.target.value)}>
-                <option value="interactive">Interactive</option>
-                <option value="oneshot">One-shot</option>
+              <select
+                className="rounded-lg border border-border bg-white px-2 py-1 text-sm text-foreground focus-visible:outline-none focus-visible:border-primary transition-colors duration-150"
+                value={spawnMode}
+                onChange={(e) => setSpawnMode(e.target.value)}
+              >
+                <option value="interactive">交互式</option>
+                <option value="oneshot">单次执行</option>
               </select>
-              <Button onClick={handleSpawn} disabled={spawning || !spawnPrompt.trim()} className="ml-auto">
-                {spawning ? "Spawning..." : "Spawn"}
+              <Button
+                onClick={handleSpawn}
+                disabled={spawning || !spawnPrompt.trim()}
+                className="ml-auto transition-all duration-150 hover:-translate-y-0.5 disabled:opacity-50 disabled:translate-y-0"
+              >
+                {spawning ? "启动中..." : "启动"}
               </Button>
             </div>
           </CardContent>
@@ -149,28 +170,39 @@ export default function AgentsPage() {
 
       {/* Agent output viewer */}
       {viewAgent && (
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
+              <CardTitle className="text-base flex items-center gap-2 font-semibold text-foreground">
                 <Terminal className="h-4 w-4" /> {viewAgent}
               </CardTitle>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setViewAgent(null)}><X className="h-3 w-3" /></Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 transition-all duration-150"
+                onClick={() => setViewAgent(null)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <pre className="bg-background border border-border rounded-md p-3 text-xs font-mono leading-4 overflow-auto max-h-[300px] whitespace-pre-wrap">
-              {agentOutput || "Waiting for output..."}
+            <pre className="bg-muted/40 border border-border rounded-lg p-3 text-xs font-mono leading-4 overflow-auto max-h-[300px] whitespace-pre-wrap text-foreground">
+              {agentOutput || "等待输出..."}
             </pre>
             <div className="flex items-center gap-2 mt-2">
               <Input
-                placeholder="Send message to agent..."
+                placeholder="给智能体发送消息..."
                 value={agentMsg}
                 onChange={(e) => setAgentMsg(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSendMsg(); }}
+                onKeyDown={(e) => { if (e.key === "发送") handleSendMsg(); }}
                 className="text-xs h-8"
               />
-              <Button size="icon" className="h-8 w-8 shrink-0" onClick={handleSendMsg}>
+              <Button
+                size="icon"
+                className="h-8 w-8 shrink-0 transition-all duration-150 hover:-translate-y-0.5"
+                onClick={handleSendMsg}
+              >
                 <Send className="h-3 w-3" />
               </Button>
             </div>
@@ -188,11 +220,23 @@ export default function AgentsPage() {
       ) : (
         <div className="flex flex-col gap-2">
           {agents.map((a) => (
-            <div key={a.name} className="flex items-center justify-between border border-border p-3 rounded-md hover:bg-secondary/30 transition-colors">
-              <div className="flex flex-col gap-0.5 cursor-pointer min-w-0" onClick={() => setViewAgent(a.name)}>
+            <div
+              key={a.name}
+              className="flex items-center justify-between border border-border bg-card p-3 rounded-lg shadow-sm transition-all duration-150 hover:border-primary hover:shadow-md"
+            >
+              <div
+                className="flex flex-col gap-0.5 cursor-pointer min-w-0"
+                onClick={() => setViewAgent(a.name)}
+              >
                 <div className="flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full ${a.status === "running" ? "bg-success animate-pulse" : "bg-muted-foreground"}`} />
-                  <span className="text-sm font-medium truncate">{a.display_name || a.name}</span>
+                  <span
+                    className={`h-2 w-2 rounded-full ${
+                      a.status === "running" ? "bg-success" : "bg-muted-foreground"
+                    }`}
+                  />
+                  <span className="text-sm font-medium truncate text-foreground">
+                    {a.display_name || a.name}
+                  </span>
                   <Badge variant="outline" className="text-[10px]">{a.mode}</Badge>
                   {a.worktree && <Badge variant="outline" className="text-[10px]">worktree</Badge>}
                 </div>
@@ -202,7 +246,12 @@ export default function AgentsPage() {
                   <span>{fmtUptime(a.uptime)}</span>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0" onClick={() => handleKill(a.name)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0 transition-all duration-150"
+                onClick={() => handleKill(a.name)}
+              >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </div>

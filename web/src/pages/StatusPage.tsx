@@ -16,30 +16,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 const PLATFORM_STATE_BADGE: Record<string, { variant: "success" | "warning" | "destructive"; label: string }> = {
-  connected: { variant: "success", label: "Connected" },
-  disconnected: { variant: "warning", label: "Disconnected" },
-  fatal: { variant: "destructive", label: "Error" },
+  connected: { variant: "success", label: "已连接" },
+  disconnected: { variant: "warning", label: "已断开" },
+  fatal: { variant: "destructive", label: "错误" },
 };
 
 const GATEWAY_STATE_DISPLAY: Record<string, { badge: "success" | "warning" | "destructive" | "outline"; label: string }> = {
-  running: { badge: "success", label: "Running" },
-  starting: { badge: "warning", label: "Starting" },
-  startup_failed: { badge: "destructive", label: "Failed" },
-  stopped: { badge: "outline", label: "Stopped" },
+  running: { badge: "success", label: "运行中" },
+  starting: { badge: "warning", label: "启动中" },
+  startup_failed: { badge: "destructive", label: "失败" },
+  stopped: { badge: "outline", label: "已停止" },
 };
 
 function gatewayValue(status: StatusResponse): string {
   if (status.gateway_running) return `PID ${status.gateway_pid}`;
-  if (status.gateway_state === "startup_failed") return "Start failed";
-  return "Not running";
+  if (status.gateway_state === "startup_failed") return "启动失败";
+  return "未运行";
 }
 
 function gatewayBadge(status: StatusResponse) {
   const info = status.gateway_state ? GATEWAY_STATE_DISPLAY[status.gateway_state] : null;
   if (info) return info;
   return status.gateway_running
-    ? { badge: "success" as const, label: "Running" }
-    : { badge: "outline" as const, label: "Off" };
+    ? { badge: "success" as const, label: "运行中" }
+    : { badge: "outline" as const, label: "关闭" };
 }
 
 export default function StatusPage() {
@@ -59,7 +59,7 @@ export default function StatusPage() {
   if (!status) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       </div>
     );
   }
@@ -69,22 +69,22 @@ export default function StatusPage() {
   const items = [
     {
       icon: Cpu,
-      label: "Agent",
+      label: "智能体",
       value: `v${status.version}`,
-      badgeText: "Live",
+      badgeText: "实时",
       badgeVariant: "success" as const,
     },
     {
       icon: Radio,
-      label: "Gateway",
+      label: "网关",
       value: gatewayValue(status),
       badgeText: gwBadge.label,
       badgeVariant: gwBadge.badge,
     },
     {
       icon: Activity,
-      label: "Active Sessions",
-      value: status.active_sessions > 0 ? `${status.active_sessions} running` : "None",
+      label: "活跃会话",
+      value: status.active_sessions > 0 ? `${status.active_sessions} running` : "无",
       badgeText: status.active_sessions > 0 ? "Live" : "Off",
       badgeVariant: (status.active_sessions > 0 ? "success" : "outline") as "success" | "outline",
     },
@@ -98,7 +98,7 @@ export default function StatusPage() {
   const alerts: { message: string; detail?: string }[] = [];
   if (status.gateway_state === "startup_failed") {
     alerts.push({
-      message: "Gateway failed to start",
+      message: "网关启动失败",
       detail: status.gateway_exit_reason ?? undefined,
     });
   }
@@ -115,7 +115,7 @@ export default function StatusPage() {
     <div className="flex flex-col gap-6">
       {/* Alert banner — breaks grid monotony for critical states */}
       {alerts.length > 0 && (
-        <div className="border border-destructive/30 bg-destructive/[0.06] p-4">
+        <div className="rounded-lg border border-destructive/30 bg-destructive/[0.06] p-4 shadow-sm">
           <div className="flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
             <div className="flex flex-col gap-2 min-w-0">
@@ -134,14 +134,14 @@ export default function StatusPage() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         {items.map(({ icon: Icon, label, value, badgeText, badgeVariant }) => (
-          <Card key={label}>
+          <Card key={label} className="rounded-lg shadow-sm transition-all duration-150 hover:shadow-md hover:border-primary/40">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">{label}</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
               <Icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
 
             <CardContent>
-              <div className="text-2xl font-bold font-display">{value}</div>
+              <div className="text-2xl font-semibold tracking-tight">{value}</div>
 
               {badgeText && (
                 <Badge variant={badgeVariant} className="mt-2">
@@ -161,7 +161,7 @@ export default function StatusPage() {
       )}
 
       {activeSessions.length > 0 && (
-        <Card>
+        <Card className="rounded-lg shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Activity className="h-5 w-5 text-success" />
@@ -173,11 +173,11 @@ export default function StatusPage() {
             {activeSessions.map((s) => (
               <div
                 key={s.id}
-                className="flex items-center justify-between gap-3 border border-border p-3 overflow-hidden"
+                className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3 overflow-hidden transition-all duration-150 hover:border-primary/40 hover:shadow-sm"
               >
                 <div className="flex flex-col gap-1 min-w-0 flex-1">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="font-medium text-sm truncate">{s.title ?? "Untitled"}</span>
+                    <span className="font-medium text-sm truncate">{s.title ?? "未命名"}</span>
 
                     <Badge variant="success" className="text-[10px] shrink-0">
                       <span className="mr-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
@@ -186,7 +186,7 @@ export default function StatusPage() {
                   </div>
 
                   <span className="text-xs text-muted-foreground truncate">
-                    <span className="font-mono-ui">{s.model ?? "unknown"}</span> · {s.message_count} msgs · {timeAgo(s.last_active)}
+                    <span className="font-mono">{s.model ?? "未知"}</span> · {s.message_count} msgs · {timeAgo(s.last_active)}
                   </span>
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function StatusPage() {
       )}
 
       {recentSessions.length > 0 && (
-        <Card>
+        <Card className="rounded-lg shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-muted-foreground" />
@@ -208,13 +208,13 @@ export default function StatusPage() {
             {recentSessions.map((s) => (
               <div
                 key={s.id}
-                className="flex items-center justify-between gap-3 border border-border p-3 overflow-hidden"
+                className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3 overflow-hidden transition-all duration-150 hover:border-primary/40 hover:shadow-sm"
               >
                 <div className="flex flex-col gap-1 min-w-0 flex-1">
-                  <span className="font-medium text-sm truncate">{s.title ?? "Untitled"}</span>
+                  <span className="font-medium text-sm truncate">{s.title ?? "未命名"}</span>
 
                   <span className="text-xs text-muted-foreground truncate">
-                    <span className="font-mono-ui">{s.model ?? "unknown"}</span> · {s.message_count} msgs · {timeAgo(s.last_active)}
+                    <span className="font-mono">{s.model ?? "unknown"}</span> · {s.message_count} msgs · {timeAgo(s.last_active)}
                   </span>
 
                   {s.preview && (
@@ -239,7 +239,7 @@ export default function StatusPage() {
 
 function PlatformsCard({ platforms }: PlatformsCardProps) {
   return (
-    <Card>
+    <Card className="rounded-lg shadow-sm">
       <CardHeader>
         <div className="flex items-center gap-2">
           <Radio className="h-5 w-5 text-muted-foreground" />
@@ -258,7 +258,7 @@ function PlatformsCard({ platforms }: PlatformsCardProps) {
           return (
             <div
               key={name}
-              className="flex items-center justify-between border border-border p-3"
+              className="flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-all duration-150 hover:border-primary/40 hover:shadow-sm"
             >
               <div className="flex items-center gap-3">
                 <IconComponent className={`h-4 w-4 ${

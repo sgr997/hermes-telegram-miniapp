@@ -128,7 +128,7 @@ function Block({ block, highlightTerms }: { block: BlockNode; highlightTerms?: s
   switch (block.type) {
     case "code":
       return (
-        <pre className="rounded-md bg-secondary/60 border border-border px-3 py-2.5 text-xs font-mono leading-relaxed overflow-x-auto">
+        <pre className="rounded-md bg-gray-50 border border-border px-3 py-2.5 text-xs font-mono leading-relaxed overflow-x-auto">
           <code>{block.content}</code>
         </pre>
       );
@@ -228,7 +228,7 @@ function InlineContent({ text, highlightTerms }: { text: string; highlightTerms?
             return <HighlightedText key={i} text={node.content} terms={highlightTerms} />;
           case "code":
             return (
-              <code key={i} className="rounded bg-secondary/60 px-1.5 py-0.5 text-xs font-mono text-primary/90">
+              <code key={i} className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono text-primary/90">
                 {node.content}
               </code>
             );

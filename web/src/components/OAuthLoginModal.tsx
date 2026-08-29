@@ -87,7 +87,7 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
         if (s !== null && s <= 1) {
           // Session expired — transition to error state
           setPhase("error");
-          setErrorMsg("Session expired. Click Retry to start a new login.");
+          setErrorMsg("会话已过期。点击重试开始新的登录。");
           return 0;
         }
         return s !== null && s > 0 ? s - 1 : 0;
@@ -141,7 +141,7 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
         window.setTimeout(() => isMounted.current && onClose(), 1500);
       } else {
         setPhase("error");
-        setErrorMsg(resp.message || "Token exchange failed");
+        setErrorMsg(resp.message || "令牌交换失败");
       }
     } catch (e) {
       if (!isMounted.current) return;
@@ -168,7 +168,7 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
       setCodeCopied(true);
       window.setTimeout(() => isMounted.current && setCodeCopied(false), 1500);
     } catch {
-      onError("Clipboard write failed");
+      onError("剪贴板写入失败");
     }
   };
 
@@ -186,24 +186,24 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-background/85 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
       onClick={handleBackdrop}
       role="dialog"
       aria-modal="true"
       aria-labelledby="oauth-modal-title"
     >
-      <div className="relative w-full max-w-md border border-border bg-card shadow-2xl">
+      <div className="relative w-full max-w-md rounded-lg border border-border bg-card shadow-[0_4px_24px_rgba(0,0,0,0.08)]">
         <button
           type="button"
           onClick={handleClose}
-          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Close"
+          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-all duration-150"
+          aria-label="关闭"
         >
           <X className="h-5 w-5" />
         </button>
         <div className="p-6 flex flex-col gap-4">
           <div>
-            <h2 id="oauth-modal-title" className="font-display text-base tracking-wider uppercase">
+            <h2 id="oauth-modal-title" className="font-sans text-lg font-semibold text-foreground">
               Connect {provider.name}
             </h2>
             {secondsLeft !== null && phase !== "approved" && phase !== "error" && (
@@ -226,7 +226,7 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
             <>
               <ol className="text-sm space-y-2 list-decimal list-inside text-muted-foreground">
                 <li>
-                  A new tab opened to <code className="text-foreground">claude.ai</code>. Sign in
+                  A new tab opened to <code className="font-mono text-foreground">claude.ai</code>. Sign in
                   and click <strong className="text-foreground">Authorize</strong>.
                 </li>
                 <li>Copy the <strong className="text-foreground">authorization code</strong> shown after authorizing.</li>
@@ -236,8 +236,8 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
                 <Input
                   value={pkceCode}
                   onChange={(e) => setPkceCode(e.target.value)}
-                  placeholder="Paste authorization code (with #state suffix is fine)"
-                  onKeyDown={(e) => e.key === "Enter" && handleSubmitPkceCode()}
+                  placeholder="粘贴授权码（带 #state 后缀也可以）"
+                  onKeyDown={(e) => e.key === "发送" && handleSubmitPkceCode()}
                   autoFocus
                 />
                 <div className="flex items-center gap-2 justify-between">
@@ -245,7 +245,7 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
                     href={(start as Extract<OAuthStartResponse, { flow: "pkce" }>).auth_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                    className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors duration-150"
                   >
                     <ExternalLink className="h-3 w-3" />
                     Re-open auth page
@@ -272,8 +272,8 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
               <p className="text-sm text-muted-foreground">
                 A new tab opened. Enter this code if prompted:
               </p>
-              <div className="flex items-center justify-between gap-2 border border-border bg-secondary/30 p-4">
-                <code className="font-mono-ui text-2xl tracking-widest text-foreground">
+              <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-muted/40 p-4">
+                <code className="font-mono text-2xl tracking-widest text-foreground">
                   {(start as Extract<OAuthStartResponse, { flow: "device_code" }>).user_code}
                 </code>
                 <Button
@@ -293,7 +293,7 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
                 href={(start as Extract<OAuthStartResponse, { flow: "device_code" }>).verification_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1 transition-colors duration-150"
               >
                 <ExternalLink className="h-3 w-3" />
                 Re-open verification page
@@ -316,8 +316,8 @@ export function OAuthLoginModal({ provider, onClose, onSuccess, onError }: Props
           {/* ── error ──────────────────────────────────────── */}
           {phase === "error" && (
             <>
-              <div className="border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-                {errorMsg || "Login failed."}
+              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+                {errorMsg || "登录失败。"}
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" size="sm" onClick={handleClose}>
